@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Стрим — MusicHost</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    :root {
+      --bg: #fff8f0;
+      --text: #4a403a;
+      --primary: #e8d5c0;
+      --accent: #b87e5c;
+      --card: #ffffff;
+      --radius: 12px;
+      --gap: 16px;
+      --trans: 0.3s ease;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      font-family: 'Manrope', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .container {
+      width: 90%;
+      max-width: 1200px;
+      margin: auto;
+      flex: 1;
+      padding: var(--gap) 0;
+    }
+    header {
+      background: var(--primary);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      position: relative;
+      z-index: 1000;
+    }
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--gap);
+      flex-wrap: wrap;
+    }
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .logo i {
+      font-size: 1.4rem;
+    }
+    #burger {
+      display: none;
+      font-size: 1.5rem;
+      background: none;
+      border: none;
+      color: var(--text);
+      cursor: pointer;
+    }
+    nav {
+      display: flex;
+      gap: var(--gap);
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    nav a {
+      background: #fff;
+      color: var(--text);
+      border: 2px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 0.5rem 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: var(--trans);
+    }
+    nav a.active,
+    nav a:hover {
+      background: var(--accent);
+      color: #fff;
+    }
+    .user-area {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .user-area .button-link {
+      background: none;
+      border: 2px solid var(--accent);
+      padding: 0.4rem 0.8rem;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: var(--trans);
+      font-weight: 600;
+    }
+    .user-area .button-link:hover {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    /* Остальной стиль аналогично предыдущему ответу — не изменяется */
+    .video-section, .chat, .cta {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      margin: calc(var(--gap) * 2) 0 var(--gap);
+      padding: var(--gap);
+      text-align: center;
+    }
+    .video-wrapper {
+      position: relative;
+      padding-top: 56.25%;
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: var(--gap);
+    }
+    .video-wrapper video {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .live-icon {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      display: flex;
+      align-items: center;
+      padding: 4px 8px;
+      border: 2px solid var(--accent);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,0.8);
+      animation: pulse 1s infinite;
+    }
+    @keyframes pulse {
+      0%,100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: var(--gap);
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-size: 1rem;
+      transition: var(--trans);
+    }
+    .btn:hover {
+      background: #ab5e48;
+      transform: translateY(-2px);
+    }
+    .chat {
+      padding: var(--gap);
+      height: 180px;
+      overflow-y: auto;
+    }
+    .chat p { margin-bottom: 8px; }
+    .chat-input {
+      display: flex;
+      border: 1px solid var(--accent);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: var(--gap);
+    }
+    .chat-input input {
+      flex: 1;
+      padding: 12px;
+      font-size: 1rem;
+      border: none;
+    }
+    .chat-input button {
+      background: var(--accent);
+      border: none;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      cursor: pointer;
+      transition: var(--trans);
+    }
+    .chat-input button:hover {
+      background: #ab5e48;
+    }
+    .cta .btn { margin-top: 12px; }
+    footer {
+      background: var(--primary);
+      text-align: center;
+      padding: var(--gap);
+      font-size: 0.9rem;
+    }
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal.show { display: flex; }
+    .modal-box {
+      background: #fff;
+      padding: var(--gap);
+      border-radius: var(--radius);
+      width: 320px;
+    }
+    .modal-box h2 {
+      margin-bottom: var(--gap);
+      color: var(--accent);
+      text-align: center;
+    }
+    .modal-box label {
+      display: block;
+      margin: 6px 0 4px;
+      font-weight: 600;
+    }
+    .modal-box input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 8px;
+      border: 1px solid var(--accent);
+      border-radius: var(--radius);
+    }
+    .modal-box .error {
+      color: red;
+      font-size: 0.85rem;
+      margin-bottom: 8px;
+    }
+    .modal-box button {
+      width: 100%;
+      padding: 10px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: var(--trans);
+    }
+    .modal-box button:hover {
+      background: #ab5e48;
+    }
+
+    @media (max-width: 768px) {
+      nav {
+        flex-direction: column;
+        width: 100%;
+        display: none;
+        margin-top: 12px;
+      }
+      nav.show { display: flex; }
+      #burger { display: block; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container header-inner">
+      <div class="logo"><i class="fas fa-music"></i> MusicHost</div>
+      <button id="burger"><i class="fas fa-bars"></i></button>
+      <nav id="mainNav">
+        <a href="index.html">Главная</a>
+        <a href="videos.html">Клипы</a>
+        <a href="channels.html">Каналы</a>
+        <a href="stream.html" class="active">Стрим</a>
+      </nav>
+      <div class="user-area" id="userArea">
+        <button class="button-link" id="btnLogin"><i class="fas fa-user"></i> Войти / Регистрация</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="intro">
+      <h1>Добро пожаловать на прямой эфир!</h1>
+      <p>Смотрите лайвы, общайтесь в чате, подписывайтесь на каналы и сами начинайте стримить!</p>
+    </section>
+
+    <section class="video-section">
+      <div class="video-wrapper">
+        <video id="liveVideo" muted autoplay loop>
+          <source src="media/live-sample.mp4" type="video/mp4" />
+        </video>
+        <div class="live-icon"><i class="fas fa-broadcast-tower"></i><span>&nbsp;LIVE</span></div>
+      </div>
+      <div class="controls">
+        <button class="btn" id="btnPlay"><i class="fas fa-pause"></i> Пауза</button>
+        <button class="btn" id="btnStartStream"><i class="fas fa-video"></i> Начать стрим</button>
+      </div>
+    </section>
+
+    <section class="chat" id="chatBox">
+      <p><strong>System:</strong> Добро пожаловать в чат стрима!</p>
+    </section>
+
+    <div class="chat-input">
+      <input type="text" id="chatInput" placeholder="Написать сообщение..." />
+      <button id="sendChat"><i class="fas fa-paper-plane"></i></button>
+    </div>
+
+    <section class="cta">
+      <h2>Присоединяйтесь!</h2>
+      <p>Подписывайтесь на любимые каналы и сами становитесь стримерами на MusicHost.</p>
+      <button class="btn" onclick="location.href='channels.html'"><i class="fas fa-play"></i> Перейти к каналам</button>
+    </section>
+  </main>
+
+  <footer><p>© 2025 MusicHost</p></footer>
+
+  <div class="modal" id="authModal">
+    <div class="modal-box">
+      <h2>Войти / Регистрация</h2>
+      <label for="authEmail">Email</label>
+      <input type="email" id="authEmail" placeholder="example@domain.com" />
+      <div id="emailError" class="error"></div>
+      <label for="authPass">Пароль (мин 8 символов)</label>
+      <input type="password" id="authPass" placeholder="Пароль" />
+      <div id="passError" class="error"></div>
+      <button id="authSubmit">Подтвердить</button>
+    </div>
+  </div>
+
+  <script>
+    const burger = document.getElementById('burger');
+    const navMenu = document.getElementById('mainNav');
+    burger.addEventListener('click', () => navMenu.classList.toggle('show'));
+
+    navMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        if (window.innerWidth <= 768) navMenu.classList.remove('show');
+      });
+    });
+
+    const userArea = document.getElementById('userArea');
+    const modal = document.getElementById('authModal');
+    const emailInput = document.getElementById('authEmail');
+    const passInput = document.getElementById('authPass');
+    const emailError = document.getElementById('emailError');
+    const passError = document.getElementById('passError');
+
+    function validateEmail(email) {
+      const re = /^[\w.%+-]+@[\w.-]+\.[A-Za-z]{2,}$/;
+      return re.test(email);
+    }
+
+    function validatePassword(pwd) {
+      return pwd.length >= 8;
+    }
+
+    function showAccount(name) {
+      userArea.innerHTML = `<span>Привет, ${name}</span><button class="button-link" id="btnLogout"><i class="fas fa-sign-out-alt"></i> Выйти</button>`;
+      document.getElementById('btnLogout').addEventListener('click', () => {
+        localStorage.removeItem('mh_user');
+        location.reload();
+      });
+    }
+
+    const stored = localStorage.getItem('mh_user');
+    if (stored) showAccount(stored);
+
+    document.getElementById('btnLogin')?.addEventListener('click', () => modal.classList.add('show'));
+
+    document.getElementById('authSubmit')?.addEventListener('click', () => {
+      emailError.textContent = '';
+      passError.textContent = '';
+      const email = emailInput.value.trim();
+      const pwd = passInput.value;
+      let valid = true;
+
+      if (!validateEmail(email)) {
+        emailError.textContent = 'Некорректный Email';
+        valid = false;
+      }
+      if (!validatePassword(pwd)) {
+        passError.textContent = 'Минимум 8 символов';
+        valid = false;
+      }
+      if (!valid) return;
+
+      const username = email.split('@')[0];
+      localStorage.setItem('mh_user', username);
+      modal.classList.remove('show');
+      showAccount(username);
+    });
+
+    const video = document.getElementById('liveVideo');
+    document.getElementById('btnPlay').addEventListener('click', () => {
+      if (!video.paused) {
+        video.pause();
+        document.getElementById('btnPlay').innerHTML = '<i class="fas fa-play"></i> Играть';
+      } else {
+        video.play();
+        document.getElementById('btnPlay').innerHTML = '<i class="fas fa-pause"></i> Пауза';
+      }
+    });
+
+    const chatBox = document.getElementById('chatBox');
+    const chatInput = document.getElementById('chatInput');
+    const sendBtn = document.getElementById('sendChat');
+
+    sendBtn.addEventListener('click', () => {
+      const msg = chatInput.value.trim();
+      if (!msg) return;
+      const user = localStorage.getItem('mh_user') || 'Guest';
+      const p = document.createElement('p');
+      p.innerHTML = `<strong>${user}:</strong> ${msg}`;
+      chatBox.appendChild(p);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      chatInput.value = '';
+    });
+
+    chatInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        sendBtn.click();
+      }
+    });
+
+    const btnStart = document.getElementById('btnStartStream');
+    btnStart.addEventListener('click', () => {
+      if (!localStorage.getItem('mh_user')) {
+        modal.classList.add('show');
+        return;
+      }
+      const running = btnStart.textContent.includes('Остановить');
+      if (!running) {
+        alert(`Стрим запущен пользователем ${localStorage.getItem('mh_user')}`);
+        btnStart.innerHTML = '<i class="fas fa-stop-circle"></i> Остановить стрим';
+      } else {
+        alert('Стрим остановлен');
+        btnStart.innerHTML = '<i class="fas fa-video"></i> Начать стрим';
+      }
+    });
+
+    modal.addEventListener('click', e => {
+      if (e.target === modal) modal.classList.remove('show');
+    });
+  </script>
+</body>
+</html>

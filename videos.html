@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Клипы — MusicHost</title>
+  <style>
+    :root {
+      --color-bg: #fff8f0;
+      --color-text: #4a403a;
+      --color-primary: #e8d5c0;
+      --color-accent: #b87e5c;
+      --color-card: #ffffff;
+      --radius: 12px;
+      --gap: 1.5rem;
+      --transition: 0.3s ease;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Manrope', sans-serif;
+      background: var(--color-bg);
+      color: var(--color-text);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    /* Header */
+    .header {
+      background: var(--color-primary);
+      padding: 1rem 0;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+
+    .header .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--color-text);
+    }
+
+    .burger {
+      display: none;
+      font-size: 2rem;
+      background: none;
+      border: none;
+      color: var(--color-text);
+      cursor: pointer;
+    }
+
+    .nav {
+      display: flex;
+      gap: var(--gap);
+    }
+
+    .nav a {
+      display: inline-block;
+      background: var(--color-card);
+      color: var(--color-text);
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border: 2px solid var(--color-accent);
+      border-radius: var(--radius);
+      transition: background var(--transition), color var(--transition), transform var(--transition);
+    }
+
+    .nav a:hover,
+    .nav a.active {
+      background: var(--color-accent);
+      color: var(--color-card);
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
+      .nav {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: var(--color-primary);
+        width: 100%;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 1rem 0;
+        z-index: 100;
+      }
+
+      .nav.show {
+        display: flex;
+      }
+
+      .burger {
+        display: block;
+      }
+    }
+
+    .intro {
+      background: var(--color-card);
+      margin: var(--gap) 0;
+      padding: 2rem;
+      border-radius: var(--radius);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      text-align: center;
+    }
+
+    .intro p {
+      font-size: 1.125rem;
+    }
+
+    .filter-bar {
+      margin-bottom: var(--gap);
+      text-align: center;
+    }
+
+    .filter-bar input {
+      width: 100%;
+      max-width: 400px;
+      padding: 0.5rem 1rem;
+      border: 2px solid var(--color-accent);
+      border-radius: var(--radius);
+      font-size: 1rem;
+      outline: none;
+      transition: border-color var(--transition);
+    }
+
+    .filter-bar input:focus {
+      border-color: var(--color-primary);
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: var(--color-accent);
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
+
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: var(--gap);
+      margin-bottom: var(--gap);
+    }
+
+    .video-card {
+      background: var(--color-card);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+      transition: transform var(--transition), box-shadow var(--transition);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .video-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .video-card video {
+      width: 100%;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .video-card[data-artist="urbn"] video {
+      max-height: 300px;
+    }
+
+    .video-card-content {
+      padding: 1rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .video-card h3 {
+      font-size: 1.25rem;
+      color: var(--color-accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .video-card p {
+      font-size: 1rem;
+      color: var(--color-text);
+      opacity: 0.8;
+      margin-bottom: 1rem;
+    }
+
+    .subscribe-btn,
+    .like-btn {
+      display: inline-block;
+      margin-right: 0.5rem;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      border-radius: var(--radius);
+      border: none;
+      cursor: pointer;
+      transition: background var(--transition), transform var(--transition);
+    }
+
+    .subscribe-btn {
+      background: var(--color-accent);
+      color: var(--color-card);
+    }
+
+    .subscribe-btn:hover {
+      background: #a05d4b;
+      transform: translateY(-2px);
+    }
+
+    .like-btn {
+      background: var(--color-primary);
+      color: var(--color-text);
+    }
+
+    .like-btn:hover {
+      background: #c4ae9a;
+      transform: translateY(-2px);
+    }
+
+    .footer {
+      background: var(--color-primary);
+      color: var(--color-text);
+      text-align: center;
+      padding: 1rem 0;
+      margin-top: auto;
+      box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .footer p {
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <div class="logo">🎵 MusicHost</div>
+      <button class="burger" id="burger">&#9776;</button>
+      <nav class="nav" id="navMenu">
+        <a href="index.html">Главная</a>
+        <a href="videos.html" class="active">Клипы</a>
+        <a href="channels.html">Каналы</a>
+        <a href="stream.html">Стрим</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="intro">
+      <p>Здесь собраны музыкальные видеоклипы со всей платформы — фильтруйте по артистам и лайкайте любимые треки!</p>
+    </section>
+
+    <div class="filter-bar">
+      <input id="artistFilter" type="text" placeholder="Поиск по артисту..." />
+    </div>
+
+    <h1>Клипы</h1>
+    <p style="text-align: center; margin-bottom: var(--gap);">
+      Смотрите новые музыкальные клипы от независимых исполнителей и популярных артистов.
+    </p>
+
+    <div class="video-grid">
+      <div class="video-card" data-artist="zvuki">
+        <video controls src="images/v4.mp4"></video>
+        <div class="video-card-content">
+          <h3>Клип: Город звуков</h3>
+          <p>Исполнитель: ZVUKI</p>
+          <button class="subscribe-btn">Подписаться</button>
+          <button class="like-btn" data-count="0">👍 0</button>
+        </div>
+      </div>
+
+      <div class="video-card" data-artist="urbn">
+        <video controls src="images/v5.mp4"></video>
+        <div class="video-card-content">
+          <h3>Клип: В ритме улиц</h3>
+          <p>Исполнитель: URBN</p>
+          <button class="subscribe-btn">Подписаться</button>
+          <button class="like-btn" data-count="0">👍 0</button>
+        </div>
+      </div>
+
+      <div class="video-card" data-artist="instasamka">
+        <video controls src="images/v6.mp4"></video>
+        <div class="video-card-content">
+          <h3>Instasamka — Rave</h3>
+          <p>Исполнитель: Instasamka</p>
+          <button class="subscribe-btn">Подписаться</button>
+          <button class="like-btn" data-count="0">👍 0</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>© 2025 MusicHost</p>
+    </div>
+  </footer>
+
+  <script>
+    // Бургер-меню
+    document.getElementById('burger').addEventListener('click', () => {
+      document.getElementById('navMenu').classList.toggle('show');
+    });
+
+    // Фильтр по артисту
+    document.getElementById('artistFilter').addEventListener('input', function () {
+      const query = this.value.trim().toLowerCase();
+      document.querySelectorAll('.video-card').forEach(card => {
+        const artist = card.getAttribute('data-artist');
+        card.style.display = artist.includes(query) ? '' : 'none';
+      });
+    });
+
+    // Подписка
+    document.querySelectorAll('.subscribe-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (btn.textContent.trim() === 'Подписаться') {
+          btn.textContent = 'Отписаться';
+          alert('Вы подписались на канал');
+        } else {
+          btn.textContent = 'Подписаться';
+          alert('Вы отписались от канала');
+        }
+      });
+    });
+
+    // Лайки
+    document.querySelectorAll('.like-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        let count = parseInt(btn.getAttribute('data-count')) || 0;
+        count++;
+        btn.setAttribute('data-count', count);
+        btn.textContent = `👍 ${count}`;
+        alert('Вы поставили лайк');
+      });
+    });
+  </script>
+</body>
+</html>
